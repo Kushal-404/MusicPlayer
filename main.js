@@ -1,5 +1,6 @@
 let {app, BrowserWindow}=require('electron')
-
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
 let mainWindow=null;
 
 let createWindow=()=>{
@@ -8,10 +9,12 @@ mainWindow= new BrowserWindow({
     height:780,
     webPreferences:{
         nodeIntegration:true,
+        contextIsolation: false,
         enableRemoteModule:true
     },
     autoHideMenuBar:true,
 });
+
 mainWindow.loadFile(__dirname + '/ui/index.html')
 
 mainWindow.on('ready-to-show', ()=>{
