@@ -1,33 +1,36 @@
-const remote = require('@electron/remote');
-const dialog = remote.dialog;
 
+const remote = require('@electron/remote');
 
 window.onload = () => {
-    const selectFile = document.getElementById('selectFile');
+    const selectFileBtn = document.getElementById('selectFile');
+    const audioPlayer = document.getElementById('audioPlayer');
 
-   
-    selectFile.onclick = async () => {
-        console.log("Button clicked!");
-        
-        try {
-            const result = await dialog.showOpenDialog({
-                title: 'Select your Music',
-                properties: ['openFile'],
-                filters: [
-                    { name: 'Music Files', extensions: ['mp3', 'wav', 'ogg'] }
-                ]
-            });
+    if (selectFileBtn) {
+        selectFileBtn.onclick = async () => {
 
-            if (!result.canceled) {
-                const filePath = result.filePaths[0];
-                console.log("Selected file:", filePath);
-                
-                // Update your UI elements
-                document.querySelector('h2').innerText = "Playing: " + filePath.split('\\').pop();
-                document.querySelector('p').innerText = "Path: " + filePath;
+            const dialog = remote.dialog; 
+
+            try {
+                const result = await dialog.showOpenDialog({
+                    title: 'Select Music',
+                    properties: ['openFile'],
+                    filters: [{ name: 'Audio', extensions: ['mp3', 'wav'] }]
+                });
+
+                if (!result.canceled && result.filePaths.length > 0) {
+                    const filePath = result.filePaths[0];
+                    
+                    const safePath = filePath.replace(/\\/g, '/');
+                    audioPlayer.src = `file:///${safePath}`;
+                    
+                    audioPlayer.load();
+                    audioPlayer.play();
+                    
+                    document.querySelector('h2').innerText = filePath.split('/').pop();
+                }
+            } catch (err) {
+                console.error("Dialog error:", err);
             }
-        } catch (err) {
-            console.error("Failed to open dialog:", err);
-        }
-    };
+        };
+    }
 };
